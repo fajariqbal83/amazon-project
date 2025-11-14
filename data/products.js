@@ -1,4 +1,4 @@
-import {formatCurrency} from '../scripts/utils/money.js'
+import { formatCurrency } from "../scripts/utils/money.js";
 
 export function getProduct(productId) {
   let matchingProduct;
@@ -28,16 +28,15 @@ class Product {
   }
 
   getStarsUrl() {
-   return `images/ratings/rating-${this.rating.stars * 10}.png`;
+    return `images/ratings/rating-${this.rating.stars * 10}.png`;
   }
 
   getPrice() {
     return `$${formatCurrency(this.priceCents)}`;
-
   }
 
   extraInfoHTML() {
-    return '';
+    return "";
   }
 }
 
@@ -50,13 +49,12 @@ class Clothing extends Product {
   }
 
   extraInfoHTML() {
-   // super.extraInfoHTML();
-    return 
+    // super.extraInfoHTML();
+    return;
     `<a href="${this.sizeChartLink}" target="_blank">
     Size chart
     </a>`;
   }
-
 }
 
 /*
@@ -94,28 +92,49 @@ const object3 = {
 
 export let products = [];
 
-export function loadProducts(fun) {
- const xhr = new XMLHttpRequest();
+export function loadProductsFetch() {
+  const promise = fetch("https://supersimplebackend.dev/products")
+    .then((response) => {
+      return response.json();
+    })
+    .then((productsData) => {
+      products = productsData.map((productDetails) => {
+        if (productDetails.type === "clothing") {
+          return new Clothing(productDetails);
+        }
+        return new Product(productDetails);
+      });
 
- xhr.addEventListener('load', () => {
-  products = JSON.parse(xhr.response).map((productDetails) => {
-  if (productDetails.type === 'clothing') {
-    return new Clothing(productDetails);
-  }
- return new Product(productDetails);
-});
+      console.log("load products");
+    });
 
-console.log('load products');
-
-fun();
- });
-
- xhr.open('GET' , 'https://supersimplebackend.dev/products');
- xhr.send();
+  return promise;
 }
 
+/*
+loadProductsFetch().then(() => {
+  console.log('next step');
+});
+*/
+export function loadProducts(fun) {
+  const xhr = new XMLHttpRequest();
 
+  xhr.addEventListener("load", () => {
+    products = JSON.parse(xhr.response).map((productDetails) => {
+      if (productDetails.type === "clothing") {
+        return new Clothing(productDetails);
+      }
+      return new Product(productDetails);
+    });
 
+    console.log("load products");
+
+    fun();
+  });
+
+  xhr.open("GET", "https://supersimplebackend.dev/products");
+  xhr.send();
+}
 
 /*
 export const products = [
@@ -785,4 +804,3 @@ export const products = [
 });
 
 */
-
